@@ -128,6 +128,7 @@ func Register(m *macaron.Macaron) {
 	// API
 	m.Group("/v1", func() {
 		m.Post("/tasklog/remove/:id", tasklog.Remove)
+		m.Post("/tasklog/removeCount/:id", tasklog.RemoveCount)
 		m.Post("/task/enable/:id", task.Enable)
 		m.Post("/task/disable/:id", task.Disable)
 	}, apiAuth)
@@ -188,7 +189,7 @@ func checkAppInstall(ctx *macaron.Context) {
 	ctx.Write([]byte(data))
 }
 
-// IP验证, 通过反向代理访问gocron，需设置Header X-Real-IP才能获取到客户端真实IP
+// IP验证, 通过反向代理访问goscheduler，需设置Header X-Real-IP才能获取到客户端真实IP
 func ipAuth(ctx *macaron.Context) {
 	if !app.Installed {
 		return

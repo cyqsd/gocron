@@ -8,6 +8,8 @@
 
 原有的延时任务拆分为独立项目[延迟队列](https://github.com/ouqiang/delay-queue)  
 
+Go因为自身的特性，非常便于跨平台的移植，但是依靠MySQL，使用起来还是稍加麻烦的，得益于xorm，本项目在原有基础上增加了SQLite的支持，使用`modernc.org/sqlite`可以不依赖CGO实现，进一步降低使用成本。
+
 ## 功能特性
 * Web界面管理定时任务
 * crontab时间表达式, 精确到秒
@@ -32,7 +34,7 @@
 > Windows、Linux、Mac OS
 
 ### 环境要求
->  MySQL
+>  MySQL 或者 SQLite
 
 
 ## 下载
@@ -137,6 +139,12 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d ouqg/gocron
 
 ## ChangeLog
 
+v1.6 Beta
+--------
+* 增加SQLite数据库支持
+* 日志优化
+    * 增加仅保留最新日志API接口
+
 v1.5
 --------
 * 前端使用Vue+ElementUI重构
@@ -169,7 +177,6 @@ v1.2.2
 
 v1.1
 --------
-
 * 任务可同时在多个节点上运行
 * *nix平台默认禁止以root用户运行任务节点
 * 子任务命令中增加预定义占位符, 子任务可根据主任务运行结果执行相应操作

@@ -3,6 +3,7 @@ package install
 import (
 	"errors"
 	"fmt"
+	"modernc.org/sqlite"
 	"strconv"
 
 	macaron "gopkg.in/macaron.v1"
@@ -20,7 +21,7 @@ import (
 // 系统安装
 
 type InstallForm struct {
-	DbType               string `binding:"In(mysql,postgres)"`
+	DbType               string `binding:"In(mysql,postgres,sqlite)"`
 	DbHost               string `binding:"Required;MaxSize(50)"`
 	DbPort               int    `binding:"Required;Range(1,65535)"`
 	DbUsername           string `binding:"Required;MaxSize(50)"`
@@ -165,6 +166,14 @@ func testDbConnection(form InstallForm) error {
 		mysqlError, ok := err.(*mysql.MySQLError)
 		if ok && mysqlError.Number == 1049 {
 			err = errors.New("数据库不存在")
+		}
+		return err
+	}
+
+	if s.Db.Engine == "sqlite" && err != nil {
+		sqliteError, ok := err.(*sqlite.Error)
+		if ok {
+			err = errors.New(sqliteError.Error())
 		}
 		return err
 	}

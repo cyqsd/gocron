@@ -2,8 +2,7 @@ package models
 
 import (
 	"time"
-
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
 )
 
 type TaskType int8
@@ -70,6 +69,16 @@ func (taskLog *TaskLog) Clear() (int64, error) {
 func (taskLog *TaskLog) Remove(id int) (int64, error) {
 	t := time.Now().AddDate(0, -id, 0)
 	return Db.Where("start_time <= ?", t.Format(DefaultTimeFormat)).Delete(taskLog)
+}
+
+// 删除最近N条日志以外的日志
+func (taskLog *TaskLog) RemoveCount(countNum int) (int64, error) {
+	var recentLogIDs []int
+	err := Db.Table(taskLog).OrderBy("id desc").Limit(countNum).Cols("id").Find(&recentLogIDs)
+	if err != nil {
+		return 0, err
+	}
+	return Db.NotIn("id", recentLogIDs).Delete(taskLog)
 }
 
 func (taskLog *TaskLog) Total(params CommonMap) (int64, error) {

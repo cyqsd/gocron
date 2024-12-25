@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/go-xorm/xorm"
+	"xorm.io/xorm"
 	"github.com/ouqiang/gocron/internal/modules/logger"
 )
 

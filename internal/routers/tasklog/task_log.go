@@ -82,6 +82,22 @@ func Remove(ctx *macaron.Context) string {
 	return json.Success("删除成功", nil)
 }
 
+// 删除最近N条日志以外的日志
+func RemoveCount(ctx *macaron.Context) string {
+	countNum := ctx.ParamsInt(":id")
+	json := utils.JsonResponse{}
+	if countNum < 1 || countNum > 1000 {
+		return json.CommonFailure("参数取值范围1-1000")
+	}
+	taskLogModel := new(models.TaskLog)
+	_, err := taskLogModel.RemoveCount(countNum)
+	if err != nil {
+		return json.CommonFailure("删除失败", err)
+	}
+
+	return json.Success("删除成功", nil)
+}
+
 // 解析查询参数
 func parseQueryParams(ctx *macaron.Context) models.CommonMap {
 	var params models.CommonMap = models.CommonMap{}

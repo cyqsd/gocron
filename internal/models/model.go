@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"xorm.io/xorm"
+	"xorm.io/xorm/log"
+	"xorm.io/xorm/names"
 
 	macaron "gopkg.in/macaron.v1"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/core"
-	"github.com/go-xorm/xorm"
-	_ "github.com/lib/pq"
 	"github.com/ouqiang/gocron/internal/modules/app"
 	"github.com/ouqiang/gocron/internal/modules/logger"
 	"github.com/ouqiang/gocron/internal/modules/setting"
+
+	_ "github.com/lib/pq"
+	_ "modernc.org/sqlite"
 )
 
 type Status int8
@@ -84,13 +87,13 @@ func CreateDb() *xorm.Engine {
 	if app.Setting.Db.Prefix != "" {
 		// 设置表前缀
 		TablePrefix = app.Setting.Db.Prefix
-		mapper := core.NewPrefixMapper(core.SnakeMapper{}, app.Setting.Db.Prefix)
+		mapper := names.NewPrefixMapper(names.SnakeMapper{}, app.Setting.Db.Prefix)
 		engine.SetTableMapper(mapper)
 	}
 	// 本地环境开启日志
 	if macaron.Env == macaron.DEV {
 		engine.ShowSQL(true)
-		engine.Logger().SetLevel(core.LOG_DEBUG)
+		engine.Logger().SetLevel(log.LOG_DEBUG)
 	}
 
 	go keepDbAlived(engine)
@@ -125,6 +128,9 @@ func getDbEngineDSN(setting *setting.Setting) string {
 			setting.Db.Host,
 			setting.Db.Port,
 			setting.Db.Database)
+	case "sqlite":
+		dsn = fmt.Sprintf("%s",
+			setting.Db.Host)
 	}
 
 	return dsn
